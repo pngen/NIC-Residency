@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(NICResidency
-        VERSION 1.0.0
+        VERSION 1.0.1
         DESCRIPTION "Vendor-neutral runtime for NIC / SmartNIC / DPU resource residency and locality"
         LANGUAGES CXX)
 
@@ -115,6 +115,10 @@ if(NICRESIDENCY_BUILD_TESTS)
   add_executable(nic_authority_worker tools/nic_authority_worker.cpp)
   target_link_libraries(nic_authority_worker PRIVATE nicresidency)
   nicresidency_configure_targets(nic_authority_worker)
+
+  add_executable(nic_residency_coordinator tools/nic_residency_coordinator.cpp)
+  target_link_libraries(nic_residency_coordinator PRIVATE nicresidency)
+  nicresidency_configure_targets(nic_residency_coordinator)
 
   add_executable(nicresidency_authority_tests tests/test_authority.cpp)
   target_link_libraries(nicresidency_authority_tests PRIVATE nicresidency)

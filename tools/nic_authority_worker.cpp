@@ -25,7 +25,8 @@ using namespace nicresidency;
 int main(int argc, char** argv) {
   std::string framePath = (argc > 1) ? argv[1] : "worker_frame.bin";
   WorkerId myId = (argc > 2) ? WorkerId(std::strtoull(argv[2], nullptr, 0)) : WorkerId(1);
-  CoordinatorEpoch epoch(1);
+  CoordinatorEpoch epoch = (argc > 4) ? CoordinatorEpoch(std::strtoull(argv[4], nullptr, 0))
+                                      : CoordinatorEpoch(1);
   WorkerBootId boot = fresh_boot_id();
 
   std::uint64_t gen = (argc > 3) ? std::strtoull(argv[3], nullptr, 0) : 1;

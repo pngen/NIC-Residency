@@ -1,6 +1,6 @@
 # NIC Residency
 
-**Version 1.0.0** &nbsp;|&nbsp; Copyright 2026 Summon Software Labs. &nbsp;|&nbsp; Apache License 2.0
+**Version 1.0.1** &nbsp;|&nbsp; Copyright 2026 Summon Software Labs. &nbsp;|&nbsp; Apache License 2.0
 
 NIC Residency is a vendor-neutral C++20 runtime for representing, governing, explaining, and fencing the
 **residency and locality** of NIC / SmartNIC / DPU resources in accelerator infrastructure. It answers a
@@ -226,7 +226,12 @@ as expected.
   revalidation, corruption / truncation / trailing-garbage rejection).
 - `nicresidency_authority_tests` -- a **real OS subprocess** worker is spawned, publishes a framed evidence frame, is
   `TerminateProcess`-killed, its process-owned evidence becomes `REVALIDATION_REQUIRED`, stale `WorkerBootId` traffic
-  is rejected, and a fresh worker incarnation restores authority; plus a coordinator-restart epoch-advance proof.
+  is rejected, and a fresh worker incarnation restores authority; plus a coordinator-restart epoch-advance proof and a
+  **real OS-process coordinator restart proof**: the `nic_residency_coordinator` is launched as its own process,
+  established under Worker A and an authoritative residency decision, persisted and then `TerminateProcess`-killed,
+  relaunched fresh, `CoordinatorEpoch` advances, durable identity/capability state is recovered
+  `REVALIDATION_REQUIRED`, live worker/process authority is not silently recovered, stale prior-epoch traffic is
+  rejected, and residency authority returns only after Worker A' re-establishes under fresh evidence.
 - `nicresidency_invariant_tests` -- reference / invariant checks, monotonic generations, SYNTHETIC / UNKNOWN
   fail-closed behaviour, a **seeded randomized property suite** (800 ops, invariants checked after every op), a
   **deterministic multi-threaded race test**, and adversarial duplicate / dangling-reference cases.
@@ -292,8 +297,11 @@ when the driver exposes it.
   are not offered by this host or backend and are honestly reported `UNSUPPORTED`.
 - NIC-level queue enumeration is not exposed by the Windows backend; queue residency is modeled for backends that
   expose it and exercised via the synthetic backend.
-- Coordinator restart is proven at the registry / state level (fresh registry, advanced epoch, recovered durable state,
-  stale-epoch rejection, required re-publish); worker process death is proven with a real OS process kill.
+- Coordinator restart is proven both at the registry / state level and with a real OS-process coordinator: the
+  coordinator is launched as an independent process, established under a live worker, persisted and terminated for real,
+  then relaunched fresh with a strictly advanced `CoordinatorEpoch`, durable identity/capability state recovered
+  `REVALIDATION_REQUIRED`, stale prior-epoch traffic rejected, and residency authority gated behind Worker A/A'
+  re-establishment under fresh evidence; worker process death is proven with a real OS process kill.
 - `std::random_device` provides boot-id entropy; boot ids are per-incarnation and are never persisted as authority.
 
 ---
