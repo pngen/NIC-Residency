@@ -1,0 +1,31 @@
+# Build directories
+build/
+build_*/
+cmake-build-*/
+
+# Microsoft Visual Studio
+.vs/
+*.user
+*.suo
+
+# MSVC / toolchain object + pdb artifacts
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.exe
+!*/examples/*.cpp
+!*/benchmarks/*.cpp
+# (the above excludes example/benchmark source; binaries are ignored)
+
+# Editor / OS
+.vscode/
+*.swp
+Thumbs.db
+
+# Test / scratch output
+*.bin
+*.ner
+*.tmp
+testout.txt
+out.txt
