@@ -47,7 +47,7 @@ dynamic evidence supporting it remain current.
 - the Transport Offload Scheduler, Fabric Scheduler, Communication Planner, or Resource Broker.
 
 NIC Residency **does not implement a networking stack**. It does **not execute GPUDirect RDMA**. It does not
-replace RDMA Buffer. It does not program SmartNIC / DPU dataplanes. It does not own general PCIe or NUMA
+replace [RDMA Buffer](https://github.com/pngen/RDMA-Buffer). It does not program SmartNIC / DPU dataplanes. It does not own general PCIe or NUMA
 governance. It is a knowledge and authority layer: it says which NIC is resident where and under which evidence,
 and it fences stale evidence. Downstream users integrate this runtime boundary into their own scheduling and
 networking stack.
