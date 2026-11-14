@@ -129,6 +129,11 @@ if(NICRESIDENCY_BUILD_TESTS)
   target_link_libraries(nicresidency_invariant_tests PRIVATE nicresidency)
   nicresidency_configure_targets(nicresidency_invariant_tests)
   add_test(NAME nicresidency_invariant_tests COMMAND nicresidency_invariant_tests)
+
+  add_executable(nicresidency_regression_tests tests/test_regression.cpp)
+  target_link_libraries(nicresidency_regression_tests PRIVATE nicresidency)
+  nicresidency_configure_targets(nicresidency_regression_tests)
+  add_test(NAME nicresidency_regression_tests COMMAND nicresidency_regression_tests)
 endif()
 
 # ---------------------------------------------------------------------------

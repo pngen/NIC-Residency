@@ -47,7 +47,7 @@ class Reader {
  public:
   explicit Reader(const std::string& data) : data_(data) {}
   std::uint8_t u8() { need(1); return static_cast<std::uint8_t>(data_[pos_++]); }
-  std::uint16_t u16() { need(2); std::uint16_t v = static_cast<std::uint16_t>(data_[pos_]) | (static_cast<std::uint16_t>(static_cast<std::uint8_t>(data_[pos_+1])) << 8); pos_ += 2; return v; }
+  std::uint16_t u16() { need(2); std::uint16_t v = static_cast<std::uint16_t>(static_cast<std::uint8_t>(data_[pos_]) | (static_cast<std::uint16_t>(static_cast<std::uint8_t>(data_[pos_+1])) << 8)); pos_ += 2; return v; }
   std::uint32_t u32() { need(4); std::uint32_t v = 0; for (int i = 0; i < 4; ++i) v |= (static_cast<std::uint32_t>(static_cast<std::uint8_t>(data_[pos_+i])) << (8*i)); pos_ += 4; return v; }
   std::uint64_t u64() { need(8); std::uint64_t v = 0; for (int i = 0; i < 8; ++i) v |= (static_cast<std::uint64_t>(static_cast<std::uint8_t>(data_[pos_+i])) << (8*i)); pos_ += 8; return v; }
   std::string str() {

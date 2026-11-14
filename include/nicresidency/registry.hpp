@@ -197,11 +197,25 @@ class NicRegistry {
     epoch_ = new_epoch;
     workers_.clear();
     worker_nics_.clear();
+    // Device readiness evidence came from prior-epoch workers whose authority is
+    // gone: it needs revalidation before it can back a residency decision.
+    for (auto& kv : nics_) {
+      if (kv.second.lifecycle == LifecycleState::kRetired) continue;
+      kv.second.lifecycle = LifecycleState::kRevalidationRequired;
+      kv.second.freshness = 0;
+    }
+    for (auto& kv : queues_) {
+      if (kv.second.lifecycle == LifecycleState::kRetired) continue;
+      kv.second.lifecycle = LifecycleState::kRevalidationRequired;
+    }
     for (auto& kv : functions_) {
       kv.second.ownership = OwnershipState::kUnassigned;
       kv.second.owner_worker = WorkerId();
       kv.second.owner_boot = WorkerBootId();
       kv.second.epoch = epoch_;
+      if (kv.second.lifecycle != LifecycleState::kRetired) {
+        kv.second.lifecycle = LifecycleState::kRevalidationRequired;
+      }
     }
     for (auto& kv : attachments_) {
       kv.second.state = AttachmentState::kStale;
@@ -282,7 +296,9 @@ class NicRegistry {
     return s;
   }
 
-  const std::vector<ResidencyRecord>& residencies() const {
+  // A copy taken under the lock: callers never read state another thread is
+  // mutating.
+  std::vector<ResidencyRecord> residencies() const {
     std::lock_guard<std::mutex> lk(mu_);
     return residencies_;
   }
@@ -312,6 +328,11 @@ class NicRegistry {
                            "stale worker boot identity rejected", boot.str());
     }
   }
+
+  // Dependents of an advanced generation (callers hold mu_).
+  void invalidate_nic_dependents_locked(NicId id);
+  void invalidate_function_dependents_locked(FunctionId id);
+  void invalidate_queue_dependents_locked(QueueId id);
 
   static void EnsureNextEpoch(CoordinatorEpoch e) {
     // Epoch must be valid (non-zero).
